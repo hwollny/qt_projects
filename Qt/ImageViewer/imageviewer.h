@@ -30,6 +30,8 @@ public:
     explicit ImageViewer(QWidget *parent = 0);
     ~ImageViewer();
 
+
+    //add a comment
 private slots:
     void on_actionOpen_triggered();
 

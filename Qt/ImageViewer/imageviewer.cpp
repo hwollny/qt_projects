@@ -172,23 +172,24 @@ void ImageViewer::on_actionBrCo_value_changed()
 {
     double beta = wi->doubleSpinBox->value();
     double alpha = wi->doubleSpinBox_2->value();
+    if(beta!=0.0 || alpha!=1.0) {
+        //boxBrightContr->setEnabled(true);
+        Q_ASSERT(image);
+        cv::Mat cvMat = ASM::QPixmapToCvMat(QPixmap::fromImage(*image));
+        cv::Mat cvMat_new = cv::Mat::zeros( cvMat.size(), cvMat.type() );
 
-    //boxBrightContr->setEnabled(true);
-    Q_ASSERT(image);
-    cv::Mat cvMat = ASM::QPixmapToCvMat(QPixmap::fromImage(*image));
-    cv::Mat cvMat_new = cv::Mat::zeros( cvMat.size(), cvMat.type() );
+        //QDoubleSpinBox box(this);
 
-    //QDoubleSpinBox box(this);
-
-    cvMat.convertTo(cvMat_new, -1, alpha, beta);
-    imageLabel->setPixmap(ASM::cvMatToQPixmap(cvMat_new));
+        cvMat.convertTo(cvMat_new, -1, alpha, beta);
+        imageLabel->setPixmap(ASM::cvMatToQPixmap(cvMat_new));
+    }
 }
 
 
 
 void ImageViewer::on_actionEqualization_triggered()
 {
-    test(ASM::QPixmapToCvMat(QPixmap::fromImage(*image)));
+    test(ASM::QPixmapToCvMat(*imageLabel->pixmap()));
 }
 
 void ImageViewer::on_actionInverte_triggered()

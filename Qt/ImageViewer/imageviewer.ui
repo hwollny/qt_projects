@@ -46,6 +46,7 @@
      <string>Edit</string>
     </property>
     <addaction name="actionBrightness_Contrast"/>
+    <addaction name="actionEqualization"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuView"/>
@@ -151,6 +152,14 @@
    </property>
    <property name="text">
     <string>Brightness &amp; Contrast</string>
+   </property>
+  </action>
+  <action name="actionEqualization">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Equalization</string>
    </property>
   </action>
  </widget>

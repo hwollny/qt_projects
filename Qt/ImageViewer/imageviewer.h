@@ -17,6 +17,7 @@
 #include "qt_to_opencv_converter.h"
 #include "asm_converter.h"
 #include "ui_popupimagesettings.h"
+#include "../pic_equalization.h"
 
 namespace Ui {
 class ImageViewer;
@@ -53,6 +54,8 @@ private slots:
 
     void on_actionBrCo_value_changed();
 
+    void on_actionEqualization_triggered();
+
 private:
     Ui::ImageViewer *ui;
     Ui::PopUpImageSettings *wi;
@@ -69,6 +72,7 @@ private:
     QAction *normalSizeAct;
     QAction *fitToWindowAct;
     QAction *brightContrAct;
+    QAction *equalAct;
 
     QWidget *ImageSettings;
     QDialog *dialog;

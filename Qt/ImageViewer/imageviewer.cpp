@@ -29,7 +29,7 @@ ImageViewer::ImageViewer(QWidget *parent) :
     normalSizeAct = ui->actionNormal_Size;
     fitToWindowAct = ui->actionFit_to_Window;
     brightContrAct = ui->actionBrightness_Contrast;
-
+    equalAct = ui->actionEqualization;
 
     setWindowTitle(tr("Image Viewer"));
     resize(500, 400);
@@ -46,6 +46,7 @@ void ImageViewer::updateActions()
     zoomOutAct->setEnabled(!fitToWindowAct->isChecked());
     normalSizeAct->setEnabled(!fitToWindowAct->isChecked());
     brightContrAct->setEnabled(!fitToWindowAct->isChecked());
+    equalAct->setEnabled(!fitToWindowAct->isChecked());
 }
 
 void ImageViewer::on_actionOpen_triggered()
@@ -182,3 +183,8 @@ void ImageViewer::on_actionBrCo_value_changed()
 }
 
 
+
+void ImageViewer::on_actionEqualization_triggered()
+{
+    test(ASM::QPixmapToCvMat(QPixmap::fromImage(*image)));
+}

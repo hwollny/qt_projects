@@ -23,12 +23,14 @@ INCLUDEPATH += /usr/include/opencv2/
 SOURCES += main.cpp\
         imageviewer.cpp \
     qt_to_opencv_converter.cpp \
-    popupimagesettings.cpp
+    popupimagesettings.cpp \
+    ../pic_equalization.cpp
 
 HEADERS  += imageviewer.h \
     qt_to_opencv_converter.h \
     asm_converter.h \
-    popupimagesettings.h
+    popupimagesettings.h \
+    ../pic_equalization.h
 
 FORMS    += imageviewer.ui \
     popupimagesettings.ui

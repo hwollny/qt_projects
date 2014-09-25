@@ -9,5 +9,7 @@
 void test(cv::Mat image);
 
 
+void inverte(cv::Mat& image);
+
 
 #endif // PIC_EQUALIZATION_H

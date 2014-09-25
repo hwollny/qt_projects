@@ -47,6 +47,7 @@
     </property>
     <addaction name="actionBrightness_Contrast"/>
     <addaction name="actionEqualization"/>
+    <addaction name="actionInverte"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuView"/>
@@ -160,6 +161,14 @@
    </property>
    <property name="text">
     <string>Equalization</string>
+   </property>
+  </action>
+  <action name="actionInverte">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Inverte</string>
    </property>
   </action>
  </widget>

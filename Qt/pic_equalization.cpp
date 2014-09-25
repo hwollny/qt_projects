@@ -53,3 +53,24 @@ void test(cv::Mat image)
     cv::imshow("Histogram", histImage );
 
 }
+
+
+
+void inverte(cv::Mat& image)
+{
+      IplImage img = image;
+      // get the image data
+      int height    = (&img)->height;
+      int width     = (&img)->width;
+      int step      = (&img)->widthStep;
+      int channels  = (&img)->nChannels;
+      uchar *data      = (uchar *)(&img)->imageData;
+
+      // invert the image
+      for(int i=0;i<height;i++)
+         for(int j=0;j<width;j++)
+            for(int k=0;k<channels;k++)  //loop to read for each channel
+               data[i*step+j*channels+k]=255-data[i*step+j*channels+k];    //inverting the image
+
+        return;
+}

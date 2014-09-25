@@ -18,6 +18,7 @@
 #include "asm_converter.h"
 #include "ui_popupimagesettings.h"
 #include "../pic_equalization.h"
+#include "opencv2/imgproc/imgproc.hpp"
 
 namespace Ui {
 class ImageViewer;
@@ -56,6 +57,8 @@ private slots:
 
     void on_actionEqualization_triggered();
 
+    void on_actionInverte_triggered();
+
 private:
     Ui::ImageViewer *ui;
     Ui::PopUpImageSettings *wi;
@@ -73,6 +76,7 @@ private:
     QAction *fitToWindowAct;
     QAction *brightContrAct;
     QAction *equalAct;
+    QAction *invAct;
 
     QWidget *ImageSettings;
     QDialog *dialog;

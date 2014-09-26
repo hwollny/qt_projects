@@ -24,13 +24,15 @@ SOURCES += main.cpp\
         imageviewer.cpp \
     qt_to_opencv_converter.cpp \
     popupimagesettings.cpp \
-    ../pic_equalization.cpp
+    ../pic_equalization.cpp \
+    popup_window1.cpp
 
 HEADERS  += imageviewer.h \
     qt_to_opencv_converter.h \
     asm_converter.h \
     popupimagesettings.h \
-    ../pic_equalization.h
+    ../pic_equalization.h \
+    popup_window1.h
 
 FORMS    += imageviewer.ui \
     popupimagesettings.ui

@@ -13,12 +13,13 @@
 #include <QMessageBox>
 #include <QDoubleSpinBox>
 #include <QGroupBox>
-
+#include <QRadioButton>
 #include "qt_to_opencv_converter.h"
 #include "asm_converter.h"
 #include "ui_popupimagesettings.h"
 #include "../pic_equalization.h"
 #include "opencv2/imgproc/imgproc.hpp"
+#include "popup_window1.h"
 
 namespace Ui {
 class ImageViewer;
@@ -59,6 +60,10 @@ private slots:
 
     void on_actionInverte_triggered();
 
+    void on_actionLinear_Filter_triggered();
+
+    void on_actionLinear_Filter_triggered_t();
+
 private:
     Ui::ImageViewer *ui;
     Ui::PopUpImageSettings *wi;
@@ -77,9 +82,11 @@ private:
     QAction *brightContrAct;
     QAction *equalAct;
     QAction *invAct;
-
+    QAction *linFiltAct;
     QWidget *ImageSettings;
     QDialog *dialog;
+
+    popup_window1 *popup_linFilt;
 
     double scaleFactor;
     double alpha;

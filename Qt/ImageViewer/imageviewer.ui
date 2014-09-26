@@ -48,6 +48,7 @@
     <addaction name="actionBrightness_Contrast"/>
     <addaction name="actionEqualization"/>
     <addaction name="actionInverte"/>
+    <addaction name="actionLinear_Filter"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuView"/>
@@ -169,6 +170,14 @@
    </property>
    <property name="text">
     <string>Inverte</string>
+   </property>
+  </action>
+  <action name="actionLinear_Filter">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Linear Filter</string>
    </property>
   </action>
  </widget>

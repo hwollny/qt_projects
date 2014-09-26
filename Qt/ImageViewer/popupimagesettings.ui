@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>187</width>
-    <height>148</height>
+    <width>197</width>
+    <height>186</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -25,8 +25,8 @@
   <widget class="QLabel" name="label">
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>10</y>
+     <x>90</x>
+     <y>20</y>
      <width>81</width>
      <height>17</height>
     </rect>
@@ -38,8 +38,8 @@
   <widget class="QLabel" name="label_2">
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>50</y>
+     <x>90</x>
+     <y>60</y>
      <width>81</width>
      <height>17</height>
     </rect>
@@ -51,8 +51,8 @@
   <widget class="QDoubleSpinBox" name="doubleSpinBox">
    <property name="geometry">
     <rect>
-     <x>90</x>
-     <y>10</y>
+     <x>10</x>
+     <y>20</y>
      <width>66</width>
      <height>26</height>
     </rect>
@@ -64,8 +64,8 @@
   <widget class="QDoubleSpinBox" name="doubleSpinBox_2">
    <property name="geometry">
     <rect>
-     <x>90</x>
-     <y>50</y>
+     <x>10</x>
+     <y>60</y>
      <width>66</width>
      <height>26</height>
     </rect>
@@ -86,14 +86,27 @@
   <widget class="QPushButton" name="pushButton">
    <property name="geometry">
     <rect>
-     <x>50</x>
-     <y>100</y>
+     <x>60</x>
+     <y>140</y>
      <width>84</width>
      <height>25</height>
     </rect>
    </property>
    <property name="text">
     <string>Ok</string>
+   </property>
+  </widget>
+  <widget class="QRadioButton" name="radioButton">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>100</y>
+     <width>111</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>From original</string>
    </property>
   </widget>
  </widget>

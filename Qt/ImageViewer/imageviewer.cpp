@@ -5,7 +5,7 @@
 ImageViewer::ImageViewer(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::ImageViewer),
-    wi(0), image(0), dialog(new QDialog)
+    wi(0), image(0), dialog(new QDialog), popup_linFilt(0)
     {
     ui->setupUi(this);
 
@@ -31,6 +31,7 @@ ImageViewer::ImageViewer(QWidget *parent) :
     brightContrAct = ui->actionBrightness_Contrast;
     equalAct = ui->actionEqualization;
     invAct = ui->actionInverte;
+    linFiltAct = ui->actionLinear_Filter;
 
     setWindowTitle(tr("Image Viewer"));
     resize(500, 400);
@@ -49,6 +50,7 @@ void ImageViewer::updateActions()
     brightContrAct->setEnabled(!fitToWindowAct->isChecked());
     equalAct->setEnabled(!fitToWindowAct->isChecked());
     invAct->setEnabled(!fitToWindowAct->isChecked());
+    linFiltAct->setEnabled(!fitToWindowAct->isChecked());
 }
 
 void ImageViewer::on_actionOpen_triggered()
@@ -174,15 +176,25 @@ void ImageViewer::on_actionBrCo_value_changed()
     double alpha = wi->doubleSpinBox_2->value();
     if(beta!=0.0 || alpha!=1.0) {
         //boxBrightContr->setEnabled(true);
-        Q_ASSERT(image);
-        cv::Mat cvMat = ASM::QPixmapToCvMat(QPixmap::fromImage(*image));
-        cv::Mat cvMat_new = cv::Mat::zeros( cvMat.size(), cvMat.type() );
+        if(wi->radioButton->isChecked()) {
+            Q_ASSERT(image);
+            cv::Mat cvMat = ASM::QPixmapToCvMat(QPixmap::fromImage(*image));
+            cv::Mat cvMat_new = cv::Mat::zeros( cvMat.size(), cvMat.type() );
 
-        //QDoubleSpinBox box(this);
+            //QDoubleSpinBox box(this);
 
-        cvMat.convertTo(cvMat_new, -1, alpha, beta);
-        imageLabel->setPixmap(ASM::cvMatToQPixmap(cvMat_new));
+            cvMat.convertTo(cvMat_new, -1, alpha, beta);
+            imageLabel->setPixmap(ASM::cvMatToQPixmap(cvMat_new));
+        }
+        else {
+            Q_ASSERT(*imageLabel->pixmap());
+            cv::Mat cvMat = ASM::QPixmapToCvMat(*imageLabel->pixmap());
+            cv::Mat cvMat_new = cv::Mat::zeros( cvMat.size(), cvMat.type() );
+            cvMat.convertTo(cvMat_new, -1, alpha, beta);
+            imageLabel->setPixmap(ASM::cvMatToQPixmap(cvMat_new));
+        }
     }
+    else if(wi->radioButton->isChecked()) imageLabel->setPixmap(QPixmap::fromImage(*image));
 }
 
 
@@ -197,4 +209,38 @@ void ImageViewer::on_actionInverte_triggered()
     cv::Mat  mat = ASM::QPixmapToCvMat(*imageLabel->pixmap());
     inverte(mat);
     imageLabel->setPixmap(ASM::cvMatToQPixmap(mat));
+}
+
+void ImageViewer::on_actionLinear_Filter_triggered()
+{
+    if(!popup_linFilt) {
+            popup_linFilt = new popup_window1();
+        popup_linFilt->setWindowTitle("Linear Filter");
+    }
+
+    popup_linFilt->show();
+
+    QObject::connect(popup_linFilt->btn1, SIGNAL(pressed()),this,SLOT(on_actionLinear_Filter_triggered_t()));
+
+}
+void ImageViewer::on_actionLinear_Filter_triggered_t()
+{
+    int kernel_size = popup_linFilt->GetValueBox1();
+    int anchor_xy = popup_linFilt->GetValueBox2();
+
+    if(anchor_xy>kernel_size-1) {
+        anchor_xy=kernel_size-1;
+        popup_linFilt->SetValueBox2(anchor_xy);
+     }
+
+    cv::Mat kernel = cv::Mat::ones( kernel_size, kernel_size, CV_32F )/ (float)(kernel_size*kernel_size);
+    cv::Mat dst;
+    cv::Point anchor;
+    anchor = cv::Point( anchor_xy, anchor_xy );
+    double delta = 0.0;
+    int ddepth = -1;
+      /// Apply filter
+    filter2D(ASM::QPixmapToCvMat(QPixmap::fromImage(*image)), dst, ddepth , kernel, anchor, delta, cv::BORDER_DEFAULT );
+
+    imageLabel->setPixmap(ASM::cvMatToQPixmap(dst));
 }

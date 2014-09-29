@@ -64,12 +64,17 @@ private slots:
 
     void on_actionLinear_Filter_triggered_t();
 
+    void on_actionSharpen_triggered();
+
+    void on_actionSharpen_triggered_t();
+
 private:
     Ui::ImageViewer *ui;
     Ui::PopUpImageSettings *wi;
     QLabel *imageLabel;
     QScrollArea *scrollArea;
     QImage *image;
+    //cv::Mat *cvMat;
 
     QAction *openAct;
     QAction *closeAct;
@@ -83,10 +88,13 @@ private:
     QAction *equalAct;
     QAction *invAct;
     QAction *linFiltAct;
+    QAction *sharpAct;
     QWidget *ImageSettings;
     QDialog *dialog;
 
+
     popup_window1 *popup_linFilt;
+    popup_window1 *popup_sharpen;
 
     double scaleFactor;
     double alpha;

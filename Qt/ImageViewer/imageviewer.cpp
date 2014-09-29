@@ -5,10 +5,11 @@
 ImageViewer::ImageViewer(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::ImageViewer),
-    wi(0), image(0), dialog(new QDialog), popup_linFilt(0)
+    wi(0), image(0), dialog(new QDialog), popup_linFilt(0), popup_sharpen(0)
     {
     ui->setupUi(this);
-
+    image  = 0;
+    //cvMat = 0;
     imageLabel = new QLabel;
     imageLabel->setBackgroundRole(QPalette::Base);
     imageLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
@@ -32,6 +33,8 @@ ImageViewer::ImageViewer(QWidget *parent) :
     equalAct = ui->actionEqualization;
     invAct = ui->actionInverte;
     linFiltAct = ui->actionLinear_Filter;
+    sharpAct = ui->actionSharpen;
+
 
     setWindowTitle(tr("Image Viewer"));
     resize(500, 400);
@@ -47,10 +50,11 @@ void ImageViewer::updateActions()
     zoomInAct->setEnabled(!fitToWindowAct->isChecked());
     zoomOutAct->setEnabled(!fitToWindowAct->isChecked());
     normalSizeAct->setEnabled(!fitToWindowAct->isChecked());
-    brightContrAct->setEnabled(!fitToWindowAct->isChecked());
-    equalAct->setEnabled(!fitToWindowAct->isChecked());
-    invAct->setEnabled(!fitToWindowAct->isChecked());
-    linFiltAct->setEnabled(!fitToWindowAct->isChecked());
+    brightContrAct->setEnabled(true);
+    equalAct->setEnabled(true);
+    invAct->setEnabled(true);
+    linFiltAct->setEnabled(true);
+    sharpAct->setEnabled(true);
 }
 
 void ImageViewer::on_actionOpen_triggered()
@@ -59,12 +63,16 @@ void ImageViewer::on_actionOpen_triggered()
     QString fileName = QFileDialog::getOpenFileName(this,
                                                     tr("Open File"), QDir::currentPath());
     if (!fileName.isEmpty()) {
+        if(image) { delete image; image = 0; }
+       //if(cvMat) { delete cvMat; cvMat = 0; }
+
         image = new QImage(fileName);
         if (image->isNull()) {
             QMessageBox::information(this, tr("Image Viewer"),
                                      tr("Cannot load %1.").arg(fileName));
             return;
         }
+
         imageLabel->setPixmap(QPixmap::fromImage(*image));
         imageLabel->adjustSize();
         scaleFactor = 1.0;
@@ -172,26 +180,35 @@ void ImageViewer::on_actionBrightness_Contrast_triggered()
 
 void ImageViewer::on_actionBrCo_value_changed()
 {
+    qDebug() << "ImageViewer::on_actionBrCo_value_changed()  begin";
     double beta = wi->doubleSpinBox->value();
     double alpha = wi->doubleSpinBox_2->value();
     if(beta!=0.0 || alpha!=1.0) {
         //boxBrightContr->setEnabled(true);
         if(wi->radioButton->isChecked()) {
             Q_ASSERT(image);
+            qDebug() << "ImageViewer::on_actionBrCo_value_changed()  converte image to cv";
             cv::Mat cvMat = ASM::QPixmapToCvMat(QPixmap::fromImage(*image));
+            qDebug() << "ImageViewer::on_actionBrCo_value_changed()  create empty picture";
             cv::Mat cvMat_new = cv::Mat::zeros( cvMat.size(), cvMat.type() );
 
             //QDoubleSpinBox box(this);
 
+            qDebug() << "ImageViewer::on_actionBrCo_value_changed()  Apply chnages";
             cvMat.convertTo(cvMat_new, -1, alpha, beta);
-            imageLabel->setPixmap(ASM::cvMatToQPixmap(cvMat_new));
+            qDebug() << "ImageViewer::on_actionBrCo_value_changed()  Converte back to pixmap";
+            imageLabel->setPixmap(ASM::cvMatToQPixmap(cvMat_new).copy());
         }
         else {
             Q_ASSERT(*imageLabel->pixmap());
+            qDebug() << "ImageViewer::on_actionBrCo_value_changed()  converte image to cv";
             cv::Mat cvMat = ASM::QPixmapToCvMat(*imageLabel->pixmap());
+            qDebug() << "ImageViewer::on_actionBrCo_value_changed()  create empty picture";
             cv::Mat cvMat_new = cv::Mat::zeros( cvMat.size(), cvMat.type() );
+            qDebug() << "ImageViewer::on_actionBrCo_value_changed()  Apply chnages";
             cvMat.convertTo(cvMat_new, -1, alpha, beta);
-            imageLabel->setPixmap(ASM::cvMatToQPixmap(cvMat_new));
+            qDebug() << "ImageViewer::on_actionBrCo_value_changed()  Converte back to pixmap";
+            imageLabel->setPixmap(ASM::cvMatToQPixmap(cvMat_new).copy());
         }
     }
     else if(wi->radioButton->isChecked()) imageLabel->setPixmap(QPixmap::fromImage(*image));
@@ -208,13 +225,13 @@ void ImageViewer::on_actionInverte_triggered()
 {
     cv::Mat  mat = ASM::QPixmapToCvMat(*imageLabel->pixmap());
     inverte(mat);
-    imageLabel->setPixmap(ASM::cvMatToQPixmap(mat));
+    imageLabel->setPixmap(ASM::cvMatToQPixmap(mat).copy());
 }
 
 void ImageViewer::on_actionLinear_Filter_triggered()
 {
     if(!popup_linFilt) {
-            popup_linFilt = new popup_window1();
+            popup_linFilt = new popup_window1(NULL,"Kernel Size","Anchor Point");
         popup_linFilt->setWindowTitle("Linear Filter");
     }
 
@@ -242,5 +259,36 @@ void ImageViewer::on_actionLinear_Filter_triggered_t()
       /// Apply filter
     filter2D(ASM::QPixmapToCvMat(QPixmap::fromImage(*image)), dst, ddepth , kernel, anchor, delta, cv::BORDER_DEFAULT );
 
-    imageLabel->setPixmap(ASM::cvMatToQPixmap(dst));
+    imageLabel->setPixmap(ASM::cvMatToQPixmap(dst).copy());
+}
+
+void ImageViewer::on_actionSharpen_triggered()
+{
+    qDebug() << "sharpen()";
+    if(!popup_sharpen) {
+            popup_sharpen = new popup_window1(NULL,"Kernel Size","Sigma");
+        popup_sharpen->setWindowTitle("Sharpen");
+
+        popup_sharpen->SetStepSizeBox1(2);
+    }
+
+    popup_sharpen->show();
+
+    QObject::connect(popup_sharpen->btn1, SIGNAL(pressed()),this,SLOT(on_actionSharpen_triggered_t()));
+
+}
+
+void ImageViewer::on_actionSharpen_triggered_t()
+{
+    int kernel_size = popup_sharpen->GetValueBox1();
+    double sigma = popup_sharpen->GetValueBox2();
+
+    cv::Mat cvMat = ASM::QPixmapToCvMat(QPixmap::fromImage(*image));
+    cv::Mat cvMat_new = cv::Mat::zeros( cvMat.size(), cvMat.type() );
+
+
+    cv::GaussianBlur(cvMat, cvMat_new, cv::Size(kernel_size, kernel_size), sigma);
+    cv::addWeighted(cvMat, 1.5, cvMat_new, -0.5, 0, cvMat_new);
+
+    imageLabel->setPixmap(ASM::cvMatToQPixmap(cvMat_new).copy());
 }

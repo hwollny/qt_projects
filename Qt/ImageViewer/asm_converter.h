@@ -11,7 +11,7 @@
 
 #include <QImage>
 #include <QPixmap>
-
+#include <QDebug>
 #include "opencv2/imgproc/imgproc.hpp"
 #include "opencv2/imgproc/types_c.h"
 
@@ -40,6 +40,7 @@ namespace ASM {
          // 8-bit, 1 channel
          case CV_8UC1:
          {
+
             static QVector<QRgb>  sColorTable;
 
             // only create our color table once

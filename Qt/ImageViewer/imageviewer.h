@@ -20,6 +20,7 @@
 #include "../pic_equalization.h"
 #include "opencv2/imgproc/imgproc.hpp"
 #include "popup_window1.h"
+#include "qspinboxpopup.h"
 
 namespace Ui {
 class ImageViewer;
@@ -70,6 +71,10 @@ private slots:
 
     void on_actionConnected_Areas_triggered();
 
+    void on_actionMake_Binary_triggered();
+
+    void on_actionMake_Binary_triggered_t();
+
 private:
     Ui::ImageViewer *ui;
     Ui::PopUpImageSettings *wi;
@@ -97,6 +102,7 @@ private:
 
     popup_window1 *popup_linFilt;
     popup_window1 *popup_sharpen;
+    QSpinBoxPopUp *popup_binary;
 
     double scaleFactor;
     double alpha;

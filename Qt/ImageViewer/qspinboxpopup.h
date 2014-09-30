@@ -1,0 +1,44 @@
+#ifndef QSPINBOXPOPUP_H
+#define QSPINBOXPOPUP_H
+
+#include <QWidget>
+#include <QVBoxLayout>
+#include <QPushButton>
+#include <QSpinBox>
+
+class QSpinBoxPopUp : public QWidget
+{
+    Q_OBJECT
+public:
+    explicit QSpinBoxPopUp(QWidget *parent = 0, const int& nboxes=1, const QString title="");
+
+    const int& GetNboxes() { return nBoxes; }
+
+    double GetValueBox(const int& ibox);
+
+    void SetValueBox(const int& ibox, const double& val);
+
+    void SetMaxValueBox(const int& ibox, const double& val);
+
+    void SetStepSizeBox(const int& ibox, const double& step);
+
+    void SetTextBox(const int& ibox, const QString& text);
+
+    QPushButton *GetPushButton() { return btn1; }
+
+signals:
+
+public slots:
+
+private:
+
+    bool CheckRange(const int& ibox) { return (ibox >= nBoxes); }
+
+    QPushButton *btn1;
+    int nBoxes;
+    QSpinBox **boxes;
+
+
+};
+
+#endif // QSPINBOXPOPUP_H

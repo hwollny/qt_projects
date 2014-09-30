@@ -5,7 +5,7 @@
 ImageViewer::ImageViewer(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::ImageViewer),
-    wi(0), image(0), dialog(new QDialog), popup_linFilt(0), popup_sharpen(0)
+    wi(0), image(0), dialog(new QDialog), popup_linFilt(0), popup_sharpen(0), popup_binary(0)
     {
     ui->setupUi(this);
     image  = 0;
@@ -35,7 +35,7 @@ ImageViewer::ImageViewer(QWidget *parent) :
     linFiltAct = ui->actionLinear_Filter;
     sharpAct = ui->actionSharpen;
 
-
+void on_actionMake_Binary_triggered();
     setWindowTitle(tr("Image Viewer"));
     resize(500, 400);
 }
@@ -56,6 +56,7 @@ void ImageViewer::updateActions()
     linFiltAct->setEnabled(true);
     sharpAct->setEnabled(true);
     ui->actionConnected_Areas->setEnabled(true);
+    ui->actionMake_Binary->setEnabled(true);
 }
 
 void ImageViewer::on_actionOpen_triggered()
@@ -332,4 +333,28 @@ void ImageViewer::on_actionConnected_Areas_triggered()
     qDebug() << "#connected areas:  " << blobs.size();
 
     imageLabel->setPixmap(ASM::cvMatToQPixmap(output).copy());
+}
+
+void ImageViewer::on_actionMake_Binary_triggered()
+{
+    if(!popup_binary) {
+        popup_binary = new QSpinBoxPopUp(NULL,1,"Make Binary");
+        popup_binary->SetMaxValueBox(0,255);
+        popup_binary->SetValueBox(0,120);
+    }
+    popup_binary->show();
+
+    QObject::connect(popup_binary->GetPushButton(), SIGNAL(pressed()),this,SLOT(on_actionMake_Binary_triggered_t()));
+}
+
+void ImageViewer::on_actionMake_Binary_triggered_t()
+{
+    cv::Mat cvMat = ASM::QPixmapToCvMat(QPixmap::fromImage(*image));
+    cv::Mat grayscaleMat (cvMat.size(), CV_8U);
+    cv::cvtColor( cvMat, grayscaleMat, CV_BGR2GRAY );
+    cv::Mat binary(grayscaleMat.size(), grayscaleMat.type());
+
+    cv::threshold(grayscaleMat, binary, popup_binary->GetValueBox(0), 255.0, cv::THRESH_BINARY);
+
+    imageLabel->setPixmap(ASM::cvMatToQPixmap(binary).copy());
 }

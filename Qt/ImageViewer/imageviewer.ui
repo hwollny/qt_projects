@@ -50,6 +50,7 @@
     <addaction name="actionInverte"/>
     <addaction name="actionLinear_Filter"/>
     <addaction name="actionSharpen"/>
+    <addaction name="actionMake_Binary"/>
    </widget>
    <widget class="QMenu" name="menuTools">
     <property name="title">
@@ -202,6 +203,14 @@
    </property>
    <property name="text">
     <string>Connected Areas</string>
+   </property>
+  </action>
+  <action name="actionMake_Binary">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Make Binary</string>
    </property>
   </action>
  </widget>

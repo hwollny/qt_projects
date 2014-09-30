@@ -17,8 +17,9 @@ unix {
     PKGCONFIG += opencv
 }
 #LIBS += -lopencv_highgui
-INCLUDEPATH += /usr/include/opencv/
-INCLUDEPATH += /usr/include/opencv2/
+INCLUDEPATH += /usr/local/include/
+INCLUDEPATH += /usr/local/include/opencv/
+INCLUDEPATH += /usr/local/include/opencv2/
 
 SOURCES += main.cpp\
         imageviewer.cpp \

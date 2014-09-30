@@ -68,6 +68,8 @@ private slots:
 
     void on_actionSharpen_triggered_t();
 
+    void on_actionConnected_Areas_triggered();
+
 private:
     Ui::ImageViewer *ui;
     Ui::PopUpImageSettings *wi;

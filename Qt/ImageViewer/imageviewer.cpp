@@ -55,6 +55,7 @@ void ImageViewer::updateActions()
     invAct->setEnabled(true);
     linFiltAct->setEnabled(true);
     sharpAct->setEnabled(true);
+    ui->actionConnected_Areas->setEnabled(true);
 }
 
 void ImageViewer::on_actionOpen_triggered()
@@ -291,4 +292,44 @@ void ImageViewer::on_actionSharpen_triggered_t()
     cv::addWeighted(cvMat, 1.5, cvMat_new, -0.5, 0, cvMat_new);
 
     imageLabel->setPixmap(ASM::cvMatToQPixmap(cvMat_new).copy());
+}
+
+void ImageViewer::on_actionConnected_Areas_triggered()
+{
+    cv::Mat cvMat = ASM::QPixmapToCvMat(QPixmap::fromImage(*image));
+    cv::Mat output = cv::Mat::zeros(cvMat.size(), CV_8UC3);
+
+    output.setTo(cv::Scalar(255,255,255));
+    cv::Mat grayscaleMat (cvMat.size(), CV_8U);
+
+        //Convert BGR to Gray
+    cv::cvtColor( cvMat, grayscaleMat, CV_BGR2GRAY );
+
+        //Binary image
+    cv::Mat binary(grayscaleMat.size(), grayscaleMat.type());
+
+
+    cv::threshold(grayscaleMat, binary, 160.0, 255.0, cv::THRESH_BINARY);
+
+
+    std::vector < std::vector<cv::Point2i > > blobs;
+    FindBlobs(binary, blobs);
+
+    for(size_t i=0; i < blobs.size(); i++) {
+            unsigned char r = 255 * (rand()/(1.0 + RAND_MAX));
+            unsigned char g = 255 * (rand()/(1.0 + RAND_MAX));
+            unsigned char b = 255 * (rand()/(1.0 + RAND_MAX));
+
+            for(size_t j=0; j < blobs[i].size(); j++) {
+                int x = blobs[i][j].x;
+                int y = blobs[i][j].y;
+
+                output.at<cv::Vec3b>(y,x)[0] = b;
+                output.at<cv::Vec3b>(y,x)[1] = g;
+                output.at<cv::Vec3b>(y,x)[2] = r;
+            }
+        }
+    qDebug() << "#connected areas:  " << blobs.size();
+
+    imageLabel->setPixmap(ASM::cvMatToQPixmap(output).copy());
 }

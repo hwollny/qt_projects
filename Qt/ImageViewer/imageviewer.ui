@@ -51,9 +51,16 @@
     <addaction name="actionLinear_Filter"/>
     <addaction name="actionSharpen"/>
    </widget>
+   <widget class="QMenu" name="menuTools">
+    <property name="title">
+     <string>Tools</string>
+    </property>
+    <addaction name="actionConnected_Areas"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuView"/>
    <addaction name="menuEdit"/>
+   <addaction name="menuTools"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <attribute name="toolBarArea">
@@ -187,6 +194,14 @@
    </property>
    <property name="text">
     <string>Sharpen</string>
+   </property>
+  </action>
+  <action name="actionConnected_Areas">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Connected Areas</string>
    </property>
   </action>
  </widget>

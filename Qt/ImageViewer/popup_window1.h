@@ -12,7 +12,8 @@ class popup_window1 : public QWidget
 
 public:
     explicit popup_window1(QWidget *parent = 0, const QString& text1="", const QString& text2="");
-    QPushButton *btn1;
+
+    virtual ~popup_window1();
 
     double GetValueBox1() { return box1->value(); }
 
@@ -24,16 +25,19 @@ public:
 
     void SetStepSizeBox2(const int& step) { box2->setSingleStep(step); }
 
+    QPushButton *GetPushButton() { return btn1; }
+
 signals:
 
 public slots:
 
 
 private:
-    QWidget *window;
-
+    QWidget *wdg;
+    QVBoxLayout *vlay;
     QSpinBox *box1;
     QSpinBox *box2;
+    QPushButton *btn1;
 
 };
 

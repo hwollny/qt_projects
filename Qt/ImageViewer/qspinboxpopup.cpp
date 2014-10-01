@@ -1,12 +1,12 @@
 #include "qspinboxpopup.h"
 
 QSpinBoxPopUp::QSpinBoxPopUp(QWidget *parent, const int& nboxes, const QString title) :
-    QWidget(parent), btn1(0), nBoxes(nboxes), boxes(0)
+    QWidget(parent), wdg(0), vlay(0), btn1(0), nBoxes(nboxes), boxes(0)
 {
     Q_ASSERT_X(nboxes>=1,"QSpinBoxPopUp::QSpinBoxPopUp","number of boxes must be at least 1");
 
-    QWidget * wdg = new QWidget(this);
-    QVBoxLayout *vlay = new QVBoxLayout(wdg);
+    wdg = new QWidget(this);
+    vlay = new QVBoxLayout(wdg);
 
     boxes = new QSpinBox*[nboxes];
     for(int ib = 0 ; ib < nboxes ; ib++)
@@ -22,6 +22,18 @@ QSpinBoxPopUp::QSpinBoxPopUp(QWidget *parent, const int& nboxes, const QString t
     if(title!="") setWindowTitle(title);
 }
 
+QSpinBoxPopUp::~QSpinBoxPopUp()
+{
+/*
+    for(int ib = 0 ; ib < nBoxes ; ib++)
+    {
+        if(boxes[ib]) { delete boxes[ib]; boxes[ib]=0; }
+    }
+    if(btn1) { delete btn1; btn1=0; }
+    if(vlay) { delete vlay; vlay=0; }
+    */
+    if(wdg) { delete wdg; wdg=0; }
+}
 
 double QSpinBoxPopUp::GetValueBox(const int& ibox)
 {

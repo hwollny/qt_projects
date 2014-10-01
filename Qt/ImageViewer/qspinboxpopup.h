@@ -12,6 +12,8 @@ class QSpinBoxPopUp : public QWidget
 public:
     explicit QSpinBoxPopUp(QWidget *parent = 0, const int& nboxes=1, const QString title="");
 
+    virtual ~QSpinBoxPopUp();
+
     const int& GetNboxes() { return nBoxes; }
 
     double GetValueBox(const int& ibox);
@@ -34,6 +36,8 @@ private:
 
     bool CheckRange(const int& ibox) { return (ibox >= nBoxes); }
 
+    QWidget *wdg;
+    QVBoxLayout *vlay;
     QPushButton *btn1;
     int nBoxes;
     QSpinBox **boxes;

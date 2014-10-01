@@ -1,11 +1,10 @@
 #include "popup_window1.h"
 
 popup_window1::popup_window1(QWidget *parent, const QString &text1, const QString &text2) :
-    QWidget(parent)
+    QWidget(parent), wdg(0), vlay(0), box1(0), box2(0), btn1(0)
 {
-    QWidget * wdg = new QWidget(this);
-
-    QVBoxLayout *vlay = new QVBoxLayout(wdg);
+    wdg = new QWidget(this);
+    vlay = new QVBoxLayout(wdg);
 
     box1 = new QSpinBox();
     box1->setPrefix(text1+":  ");
@@ -30,3 +29,15 @@ popup_window1::popup_window1(QWidget *parent, const QString &text1, const QStrin
     */
   //  setCentralWidget(wdg);
 }
+
+popup_window1::~popup_window1()
+{
+/*
+    if(box1) { delete box1; box1 = 0 ; }
+    if(box2) { delete box2; box2 = 0 ; }
+    if(btn1) { delete btn1; btn1 = 0 ; }
+    if(vlay) { delete vlay; vlay=0; }
+    */
+    if(wdg) { delete wdg; wdg=0; }
+}
+

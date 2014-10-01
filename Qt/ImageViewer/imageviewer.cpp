@@ -5,7 +5,7 @@
 ImageViewer::ImageViewer(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::ImageViewer),
-    wi(0), image(0), dialog(new QDialog), popup_linFilt(0), popup_sharpen(0), popup_binary(0)
+    wi(0), imageLabel(0), scrollArea(0), image(0), ImageSettings(0), dialog(new QDialog), popup_linFilt(0), popup_sharpen(0), popup_binary(0)
     {
     ui->setupUi(this);
     image  = 0;
@@ -21,40 +21,31 @@ ImageViewer::ImageViewer(QWidget *parent) :
     setCentralWidget(scrollArea);
 
 
-    openAct = ui->actionOpen;
-    closeAct = ui->actionClose;
-    saveAsAct = ui->actionSave_as;
-    exitAct = ui->actionExit;
-    zoomInAct = ui->actionZoom_In;
-    zoomOutAct = ui->actionZoom_Out;
-    normalSizeAct = ui->actionNormal_Size;
-    fitToWindowAct = ui->actionFit_to_Window;
-    brightContrAct = ui->actionBrightness_Contrast;
-    equalAct = ui->actionEqualization;
-    invAct = ui->actionInverte;
-    linFiltAct = ui->actionLinear_Filter;
-    sharpAct = ui->actionSharpen;
-
-void on_actionMake_Binary_triggered();
     setWindowTitle(tr("Image Viewer"));
     resize(500, 400);
 }
 
 ImageViewer::~ImageViewer()
 {
-    delete ui;
+    qDebug() << "Call destructor of ImageViewer ";
+    if(ui) { delete ui; ui = 0; }
+    if(wi) { delete wi; wi = 0 ; }
+    if(popup_linFilt) { popup_linFilt->close(); delete popup_linFilt; popup_linFilt = 0; }
+    if(popup_sharpen) { popup_sharpen->close(); delete popup_sharpen; popup_sharpen = 0; }
+    if(popup_binary) { popup_binary->close(); delete popup_binary; popup_binary = 0; }
+
 }
 void ImageViewer::updateActions()
 {
 
-    zoomInAct->setEnabled(!fitToWindowAct->isChecked());
-    zoomOutAct->setEnabled(!fitToWindowAct->isChecked());
-    normalSizeAct->setEnabled(!fitToWindowAct->isChecked());
-    brightContrAct->setEnabled(true);
-    equalAct->setEnabled(true);
-    invAct->setEnabled(true);
-    linFiltAct->setEnabled(true);
-    sharpAct->setEnabled(true);
+    ui->actionZoom_In->setEnabled(!ui->actionFit_to_Window->isChecked());
+    ui->actionZoom_Out->setEnabled(!ui->actionFit_to_Window->isChecked());
+    ui->actionNormal_Size->setEnabled(!ui->actionFit_to_Window->isChecked());
+    ui->actionBrightness_Contrast->setEnabled(true);
+    ui->actionEqualization->setEnabled(true);
+    ui->actionInverte->setEnabled(true);
+    ui->actionLinear_Filter->setEnabled(true);
+    ui->actionSharpen->setEnabled(true);
     ui->actionConnected_Areas->setEnabled(true);
     ui->actionMake_Binary->setEnabled(true);
 }
@@ -79,12 +70,12 @@ void ImageViewer::on_actionOpen_triggered()
         imageLabel->adjustSize();
         scaleFactor = 1.0;
 
-        closeAct->setEnabled(true);
-        saveAsAct->setEnabled(true);
-        fitToWindowAct->setEnabled(true);
+        ui->actionClose->setEnabled(true);
+        ui->actionSave_as->setEnabled(true);
+        ui->actionFit_to_Window->setEnabled(true);
         updateActions();
 
-        if (!fitToWindowAct->isChecked())
+        if (!ui->actionFit_to_Window->isChecked())
             imageLabel->adjustSize();
 
     }
@@ -123,7 +114,7 @@ bool ImageViewer::yes_no_box(const QString& filename)
 
 void ImageViewer::on_actionFit_to_Window_triggered()
 {
-    bool fitToWindow = fitToWindowAct->isChecked();
+    bool fitToWindow = ui->actionFit_to_Window->isChecked();
     scrollArea->setWidgetResizable(fitToWindow);
     if (!fitToWindow) {
         on_actionNormal_Size_triggered();
@@ -155,8 +146,8 @@ void ImageViewer::scaleImage(double factor)
     adjustScrollBar(scrollArea->horizontalScrollBar(), factor);
     adjustScrollBar(scrollArea->verticalScrollBar(), factor);
 
-    zoomInAct->setEnabled(scaleFactor < 3.0);
-    zoomOutAct->setEnabled(scaleFactor > 0.333);
+    ui->actionZoom_In->setEnabled(scaleFactor < 3.0);
+    ui->actionZoom_Out->setEnabled(scaleFactor > 0.333);
 }
 void ImageViewer::adjustScrollBar(QScrollBar *scrollBar, double factor)
 {
@@ -239,7 +230,7 @@ void ImageViewer::on_actionLinear_Filter_triggered()
 
     popup_linFilt->show();
 
-    QObject::connect(popup_linFilt->btn1, SIGNAL(pressed()),this,SLOT(on_actionLinear_Filter_triggered_t()));
+    QObject::connect(popup_linFilt->GetPushButton(), SIGNAL(pressed()),this,SLOT(on_actionLinear_Filter_triggered_t()));
 
 }
 void ImageViewer::on_actionLinear_Filter_triggered_t()
@@ -276,7 +267,7 @@ void ImageViewer::on_actionSharpen_triggered()
 
     popup_sharpen->show();
 
-    QObject::connect(popup_sharpen->btn1, SIGNAL(pressed()),this,SLOT(on_actionSharpen_triggered_t()));
+    QObject::connect(popup_sharpen->GetPushButton(), SIGNAL(pressed()),this,SLOT(on_actionSharpen_triggered_t()));
 
 }
 
@@ -358,3 +349,18 @@ void ImageViewer::on_actionMake_Binary_triggered_t()
 
     imageLabel->setPixmap(ASM::cvMatToQPixmap(binary).copy());
 }
+
+void ImageViewer::on_actionExit_triggered()
+{
+    this->close();
+}
+
+ void ImageViewer::closeEvent(QCloseEvent *c)
+ {
+qDebug() << "Close Event called";
+if(wi) {dialog->close(); }
+if(popup_linFilt) { popup_linFilt->close(); }
+if(popup_sharpen) { popup_sharpen->close(); }
+if(popup_binary) { popup_binary->close(); }
+ }
+

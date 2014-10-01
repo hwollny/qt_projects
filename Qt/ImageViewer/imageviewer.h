@@ -32,6 +32,7 @@ class ImageViewer : public QMainWindow
 
 public:
     explicit ImageViewer(QWidget *parent = 0);
+
     ~ImageViewer();
 
 
@@ -75,6 +76,8 @@ private slots:
 
     void on_actionMake_Binary_triggered_t();
 
+    void on_actionExit_triggered();
+
 private:
     Ui::ImageViewer *ui;
     Ui::PopUpImageSettings *wi;
@@ -83,19 +86,7 @@ private:
     QImage *image;
     //cv::Mat *cvMat;
 
-    QAction *openAct;
-    QAction *closeAct;
-    QAction *saveAsAct;
-    QAction *exitAct;
-    QAction *zoomInAct;
-    QAction *zoomOutAct;
-    QAction *normalSizeAct;
-    QAction *fitToWindowAct;
-    QAction *brightContrAct;
-    QAction *equalAct;
-    QAction *invAct;
-    QAction *linFiltAct;
-    QAction *sharpAct;
+
     QWidget *ImageSettings;
     QDialog *dialog;
 
@@ -113,6 +104,8 @@ private:
     void scaleImage(double factor);
 
     void adjustScrollBar(QScrollBar *scrollBar, double factor);
+
+    void closeEvent(QCloseEvent *c);
 };
 
 #endif // IMAGEVIEWER_H

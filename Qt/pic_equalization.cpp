@@ -218,7 +218,9 @@ void createBoxMask(Mat& box, const int& half_size_x, const int& half_size_y)
 }
 
 Mat createGausFilterMask(Size mask_size, int x, int y, int ksize, bool normalization, bool invert) {
+
     // Some corrections if out of bounds
+    /*
     if(x < (ksize / 2)) {
         ksize = x * 2;
     }
@@ -231,7 +233,7 @@ Mat createGausFilterMask(Size mask_size, int x, int y, int ksize, bool normaliza
     if(mask_size.height - y < ksize / 2 ) {
         ksize = (mask_size.height - y) * 2;
     }
-
+*/
     // call openCV gaussian kernel generator
     double sigma = -1;
     Mat kernelX = getGaussianKernel(ksize, sigma, CV_32F);
@@ -242,9 +244,12 @@ Mat createGausFilterMask(Size mask_size, int x, int y, int ksize, bool normaliza
     Mat mask = Mat::zeros(mask_size, CV_32F);
     Mat maski = Mat::zeros(mask_size, CV_32F);
 
+    //std::cout << "before:n" << mask << std::endl;
     // copy kernel to mask on x,y
     Mat pos(mask, Rect(x - ksize / 2, y - ksize / 2, ksize, ksize));
     kernel.copyTo(pos);
+
+     //std::cout << "after:n" << mask << std::endl;
 
     // create mirrored mask
     Mat posi(maski, Rect(( mask_size.width - x) - ksize / 2, (mask_size.height - y) - ksize / 2, ksize, ksize));
@@ -265,3 +270,19 @@ Mat createGausFilterMask(Size mask_size, int x, int y, int ksize, bool normaliza
     return mask;
 }
 
+void test()
+{
+    uchar vals[] = {1,1,1,1,
+                    1,1,1,1,
+                    1,1,1,1,
+                    1,1,1,1};
+    cv::Mat_<uchar> A(4,4,vals);
+    std::cout << "before:n" << A << std::endl;
+
+    cv::Rect roi(1,1,2,2);
+    cv::Mat_<uchar> B( A, roi );
+    B.setTo(0);
+
+    std::cout << "after:n" << A << std::endl;
+
+}

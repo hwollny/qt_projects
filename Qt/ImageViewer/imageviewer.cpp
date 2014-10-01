@@ -374,16 +374,17 @@ void ImageViewer::on_actionDFT_triggered()
    cv::Mat cvMat_dft =  computeDFT(grayscaleMat);
    cv::Mat magI;
    updateMag(cvMat_dft,magI);
-   cv::Mat cvMat_dft_filtered;
+   //cv::Mat cvMat_dft_filtered;
    //magI.convertTo(show,CV_8U);
 
-   cv::Mat box = cv::Mat::ones(cvMat_dft.size(), cvMat_dft.type());
+   //cv::Mat box = cv::Mat::ones(cvMat_dft.size(), cvMat_dft.type());
    //createBoxMask(box,box.cols/1,box.rows/1);
-   cvMat_dft_filtered = box.mul(cvMat_dft);
+   //cvMat_dft_filtered = box.mul(cvMat_dft);
 
-   Mat mask = createGausFilterMask(cvMat_dft.size(), box.rows/2, box.cols/2, 100, true, true);
+   //Mat mask = createGausFilterMask(cvMat_dft.size(), box.rows/2, box.cols/2, 100, true, true);
+   Mat mask = createGausFilterMask(cvMat_dft.size(), cvMat_dft.rows/2, cvMat_dft.cols/2, min(cvMat_dft.rows,cvMat_dft.cols), true, true);
 
-   shift(mask);
+   //shift(mask);
 
    Mat planes[] = {Mat::zeros(cvMat_dft.size(), CV_32F), Mat::zeros(cvMat_dft.size(), CV_32F)};
    Mat kernel_spec;
@@ -405,7 +406,8 @@ void ImageViewer::on_actionDFT_triggered()
   // inverseTransform.convertTo(finalImage, CV_8U);
 
 //imshow("box", box);
-//imshow("spectrum", magI);
+imshow("spectrum", magI);
+imshow("spectrum filtered", magI2);
 imshow("filtered", inverseTransform);
    QWidget wdg1(this);
    QLabel *imageLabel1 = new QLabel;
@@ -416,6 +418,7 @@ imshow("filtered", inverseTransform);
    QScrollArea *scrollArea1 = new QScrollArea;
    scrollArea1->setBackgroundRole(QPalette::Dark);
    scrollArea1->setWidget(imageLabel1);
+
 
    //wdg1.show();
    //imageLabel1->setPixmap(ASM::cvMatToQPixmap(show).copy());

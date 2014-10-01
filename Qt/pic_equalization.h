@@ -27,4 +27,6 @@ void createBoxMask(Mat& box, const int& half_size_x, const int &half_size_y);
 
 Mat createGausFilterMask(Size mask_size, int x, int y, int ksize, bool normalization, bool invert);
 
+void test();
+
 #endif // PIC_EQUALIZATION_H

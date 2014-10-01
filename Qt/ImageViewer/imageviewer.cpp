@@ -48,6 +48,7 @@ void ImageViewer::updateActions()
     ui->actionSharpen->setEnabled(true);
     ui->actionConnected_Areas->setEnabled(true);
     ui->actionMake_Binary->setEnabled(true);
+    ui->actionDFT->setEnabled(true);
 }
 
 void ImageViewer::on_actionOpen_triggered()
@@ -363,4 +364,61 @@ if(popup_linFilt) { popup_linFilt->close(); }
 if(popup_sharpen) { popup_sharpen->close(); }
 if(popup_binary) { popup_binary->close(); }
  }
+
+
+void ImageViewer::on_actionDFT_triggered()
+{
+   cv::Mat cvMat = ASM::QPixmapToCvMat(QPixmap::fromImage(*image));
+   cv::Mat grayscaleMat (cvMat.size(), CV_8U);
+   cv::cvtColor( cvMat, grayscaleMat, CV_BGR2GRAY );
+   cv::Mat cvMat_dft =  computeDFT(grayscaleMat);
+   cv::Mat magI;
+   updateMag(cvMat_dft,magI);
+   cv::Mat cvMat_dft_filtered;
+   //magI.convertTo(show,CV_8U);
+
+   cv::Mat box = cv::Mat::ones(cvMat_dft.size(), cvMat_dft.type());
+   //createBoxMask(box,box.cols/1,box.rows/1);
+   cvMat_dft_filtered = box.mul(cvMat_dft);
+
+   Mat mask = createGausFilterMask(cvMat_dft.size(), box.rows/2, box.cols/2, 100, true, true);
+
+   shift(mask);
+
+   Mat planes[] = {Mat::zeros(cvMat_dft.size(), CV_32F), Mat::zeros(cvMat_dft.size(), CV_32F)};
+   Mat kernel_spec;
+   planes[0] = mask; // real
+   planes[1] = mask; // imaginar
+   imshow("mask", planes[0]);
+   merge(planes, 2, kernel_spec);
+
+   mulSpectrums(cvMat_dft, kernel_spec, cvMat_dft , DFT_ROWS); // only DFT_ROWS accepted
+   cv::Mat magI2;
+   updateMag(cvMat_dft,magI2);		// show spectrum
+
+
+   cv::Mat inverseTransform;
+   cv::dft(cvMat_dft,inverseTransform,cv::DFT_INVERSE|cv::DFT_REAL_OUTPUT);
+    normalize(inverseTransform, inverseTransform, 0, 1, CV_MINMAX);
+   // Back to 8-bits
+   //cv::Mat finalImage;
+  // inverseTransform.convertTo(finalImage, CV_8U);
+
+//imshow("box", box);
+//imshow("spectrum", magI);
+imshow("filtered", inverseTransform);
+   QWidget wdg1(this);
+   QLabel *imageLabel1 = new QLabel;
+   imageLabel1->setBackgroundRole(QPalette::Base);
+   imageLabel1->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
+   imageLabel1->setScaledContents(true);
+
+   QScrollArea *scrollArea1 = new QScrollArea;
+   scrollArea1->setBackgroundRole(QPalette::Dark);
+   scrollArea1->setWidget(imageLabel1);
+
+   //wdg1.show();
+   //imageLabel1->setPixmap(ASM::cvMatToQPixmap(show).copy());
+   //imageLabel1->adjustSize();
+}
 

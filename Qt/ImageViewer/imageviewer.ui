@@ -57,6 +57,7 @@
      <string>Tools</string>
     </property>
     <addaction name="actionConnected_Areas"/>
+    <addaction name="actionDFT"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuView"/>
@@ -211,6 +212,14 @@
    </property>
    <property name="text">
     <string>Make Binary</string>
+   </property>
+  </action>
+  <action name="actionDFT">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>DFT</string>
    </property>
   </action>
  </widget>

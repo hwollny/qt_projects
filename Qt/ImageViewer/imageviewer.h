@@ -78,6 +78,8 @@ private slots:
 
     void on_actionExit_triggered();
 
+    void on_actionDFT_triggered();
+
 private:
     Ui::ImageViewer *ui;
     Ui::PopUpImageSettings *wi;

@@ -23,9 +23,9 @@ void updateMag(Mat complex, Mat& magI);
 
 Mat computeDFT(Mat image);
 
-void createBoxMask(Mat& box, const int& half_size_x, const int &half_size_y);
+Mat createBoxMask(Size mask_size, const int& x, const int& y, const int& ksize_x, const int& ksize_y, bool invert);
 
-Mat createGausFilterMask(Size mask_size, int x, int y, int ksize, bool normalization, bool invert);
+Mat createGausFilterMask(Size mask_size, const int& x, const int& y, int ksize_x, int ksize_y, bool normalization, bool invert);
 
 void test();
 

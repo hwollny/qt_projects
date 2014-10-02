@@ -5,7 +5,8 @@
 ImageViewer::ImageViewer(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::ImageViewer),
-    wi(0), imageLabel(0), scrollArea(0), image(0), ImageSettings(0), dialog(new QDialog), popup_linFilt(0), popup_sharpen(0), popup_binary(0)
+    wi(0), imageLabel(0), scrollArea(0), image(0), dialog(new QDialog), popup_linFilt(0), popup_sharpen(0), popup_binary(0),
+    scene(0), view(0), item(0)
     {
     ui->setupUi(this);
     image  = 0;
@@ -368,60 +369,57 @@ if(popup_binary) { popup_binary->close(); }
 
 void ImageViewer::on_actionDFT_triggered()
 {
-   cv::Mat cvMat = ASM::QPixmapToCvMat(QPixmap::fromImage(*image));
-   cv::Mat grayscaleMat (cvMat.size(), CV_8U);
-   cv::cvtColor( cvMat, grayscaleMat, CV_BGR2GRAY );
-   cv::Mat cvMat_dft =  computeDFT(grayscaleMat);
-   cv::Mat magI;
-   updateMag(cvMat_dft,magI);
-   //cv::Mat cvMat_dft_filtered;
-   //magI.convertTo(show,CV_8U);
+    cv::Mat cvMat = ASM::QPixmapToCvMat(QPixmap::fromImage(*image));
+    cv::Mat grayscaleMat (cvMat.size(), CV_8U);
+    cv::cvtColor( cvMat, grayscaleMat, CV_BGR2GRAY );
 
-   //cv::Mat box = cv::Mat::ones(cvMat_dft.size(), cvMat_dft.type());
-   //createBoxMask(box,box.cols/1,box.rows/1);
-   //cvMat_dft_filtered = box.mul(cvMat_dft);
+    int width = grayscaleMat.cols;
+    int height = grayscaleMat.rows;
 
-   //Mat mask = createGausFilterMask(cvMat_dft.size(), box.rows/2, box.cols/2, 100, true, true);
-   Mat mask = createGausFilterMask(cvMat_dft.size(), cvMat_dft.rows/2, cvMat_dft.cols/2, min(cvMat_dft.rows,cvMat_dft.cols), true, true);
-
-   //shift(mask);
-
-   Mat planes[] = {Mat::zeros(cvMat_dft.size(), CV_32F), Mat::zeros(cvMat_dft.size(), CV_32F)};
-   Mat kernel_spec;
-   planes[0] = mask; // real
-   planes[1] = mask; // imaginar
-   imshow("mask", planes[0]);
-   merge(planes, 2, kernel_spec);
-
-   mulSpectrums(cvMat_dft, kernel_spec, cvMat_dft , DFT_ROWS); // only DFT_ROWS accepted
-   cv::Mat magI2;
-   updateMag(cvMat_dft,magI2);		// show spectrum
+    cv::Mat cvMat_dft =  computeDFT(grayscaleMat);
+    cv::Mat magI;
+    updateMag(cvMat_dft,magI);
 
 
-   cv::Mat inverseTransform;
-   cv::dft(cvMat_dft,inverseTransform,cv::DFT_INVERSE|cv::DFT_REAL_OUTPUT);
-    normalize(inverseTransform, inverseTransform, 0, 1, CV_MINMAX);
-   // Back to 8-bits
-   //cv::Mat finalImage;
-  // inverseTransform.convertTo(finalImage, CV_8U);
+    //Mat mask = createBoxMask(cvMat_dft.size(), cvMat_dft.cols/2, cvMat_dft.rows/2,cvMat_dft.cols/8,cvMat_dft.rows/8, true);
+    Mat mask = createGausFilterMask(cvMat_dft.size(), cvMat_dft.cols/2, cvMat_dft.rows/2,cvMat_dft.cols/2,cvMat_dft.rows/2, true, true);
+    std::cout << "before mul spect  " << grayscaleMat.size() << "   " << cvMat_dft.size() << "  " <<  "  " << mask.size() << std::endl;
 
-//imshow("box", box);
-imshow("spectrum", magI);
-imshow("spectrum filtered", magI2);
-imshow("filtered", inverseTransform);
-   QWidget wdg1(this);
-   QLabel *imageLabel1 = new QLabel;
-   imageLabel1->setBackgroundRole(QPalette::Base);
-   imageLabel1->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
-   imageLabel1->setScaledContents(true);
+    shift(mask);
 
-   QScrollArea *scrollArea1 = new QScrollArea;
-   scrollArea1->setBackgroundRole(QPalette::Dark);
-   scrollArea1->setWidget(imageLabel1);
+    Mat planes[] = {Mat::zeros(cvMat_dft.size(), CV_32F), Mat::zeros(cvMat_dft.size(), CV_32F)};
+    Mat kernel_spec;
+    planes[0] = mask; // real
+    planes[1] = mask; // imaginar
+
+    merge(planes, 2, kernel_spec);
+
+    mulSpectrums(cvMat_dft, kernel_spec, cvMat_dft , DFT_ROWS); // only DFT_ROWS accepted
+    cv::Mat magI2;
+    updateMag(cvMat_dft,magI2);		// show spectrum
 
 
-   //wdg1.show();
-   //imageLabel1->setPixmap(ASM::cvMatToQPixmap(show).copy());
-   //imageLabel1->adjustSize();
+    cv::Mat inverseTransform;
+    cv::dft(cvMat_dft,inverseTransform,cv::DFT_INVERSE|cv::DFT_REAL_OUTPUT);
+    normalize(inverseTransform, inverseTransform, 0, 255, CV_MINMAX);
+    cv::Mat finalImage = inverseTransform;
+    if(width <inverseTransform.cols || height<inverseTransform.rows) {
+        finalImage = inverseTransform(Rect(0,0,width,height));
+    }
+    // Back to 8-bits
+    cv::Mat finalImage2;
+    finalImage.convertTo(finalImage2, CV_8U);
+
+    if(!scene) scene = new QGraphicsScene;
+    if(!view) view = new QGraphicsView(scene);
+    if(item) {
+        scene->clear();
+        //delete item; item=0;
+    }
+    item = new QGraphicsPixmapItem(ASM::cvMatToQPixmap(finalImage2).copy());
+    scene->addItem(item);
+    view->adjustSize();
+    view->show();
+
 }
 

@@ -27,7 +27,8 @@ SOURCES += main.cpp\
     popupimagesettings.cpp \
     ../pic_equalization.cpp \
     popup_window1.cpp \
-    qspinboxpopup.cpp
+    qspinboxpopup.cpp \
+    qlabelpopup.cpp
 
 HEADERS  += imageviewer.h \
     qt_to_opencv_converter.h \
@@ -35,7 +36,8 @@ HEADERS  += imageviewer.h \
     popupimagesettings.h \
     ../pic_equalization.h \
     popup_window1.h \
-    qspinboxpopup.h
+    qspinboxpopup.h \
+    qlabelpopup.h
 
 FORMS    += imageviewer.ui \
     popupimagesettings.ui

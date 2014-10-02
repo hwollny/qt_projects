@@ -21,6 +21,11 @@
 #include "opencv2/imgproc/imgproc.hpp"
 #include "popup_window1.h"
 #include "qspinboxpopup.h"
+#include "qlabelpopup.h"
+#include <QGraphicsScene>
+#include <QGraphicsView>
+#include <QGraphicsPixmapItem>
+
 
 namespace Ui {
 class ImageViewer;
@@ -89,13 +94,16 @@ private:
     //cv::Mat *cvMat;
 
 
-    QWidget *ImageSettings;
     QDialog *dialog;
 
 
     popup_window1 *popup_linFilt;
     popup_window1 *popup_sharpen;
     QSpinBoxPopUp *popup_binary;
+
+    QGraphicsScene *scene;
+    QGraphicsView *view;
+    QGraphicsPixmapItem *item;
 
     double scaleFactor;
     double alpha;

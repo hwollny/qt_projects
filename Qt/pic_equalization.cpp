@@ -125,15 +125,21 @@ void FindBlobs(const cv::Mat &binary, std::vector < std::vector<cv::Point2i> > &
 void shift(Mat &magI) {
 
     // crop if it has an odd number of rows or columns
-    magI = magI(Rect(0, 0, magI.cols & -2, magI.rows & -2));
+    //magI = magI(Rect(0, 0, magI.cols & -2, magI.rows & -2));
 
     int cx = magI.cols/2;
     int cy = magI.rows/2;
 
+    int cx2 = cx;
+    int cy2 = cy;
+
+    if((magI.cols%2)==1) cx2 +=1;
+    if((magI.rows%2)==1) cy2 +=1;
+
     Mat q0(magI, Rect(0, 0, cx, cy));   // Top-Left - Create a ROI per quadrant
-    Mat q1(magI, Rect(cx, 0, cx, cy));  // Top-Right
+    Mat q1(magI, Rect(cx, 0, cx2, cy2));  // Top-Right
     Mat q2(magI, Rect(0, cy, cx, cy));  // Bottom-Left
-    Mat q3(magI, Rect(cx, cy, cx, cy)); // Bottom-Right
+    Mat q3(magI, Rect(cx, cy, cx2, cy2)); // Bottom-Right
 
     Mat tmp;                            // swap quadrants (Top-Left with Bottom-Right)
     q0.copyTo(tmp);
@@ -178,91 +184,66 @@ Mat computeDFT(Mat image) {
     return complex;
 }
 
-void createBoxMask(Mat& box, const int& half_size_x, const int& half_size_y)
+Mat createBoxMask(Size mask_size, const int& x, const int& y, const int& ksize_x, const int& ksize_y, bool invert)
 {
+    Mat kernelX = Mat::ones(ksize_x, 1, CV_32F);
+    Mat kernelY = Mat::ones(ksize_y, 1, CV_32F);
+    Mat kernel = kernelY * kernelX.t();
+    Mat mask = Mat::zeros(mask_size, CV_32F);
+    Mat pos(mask, Rect(x - ksize_x / 2, y - ksize_y / 2, ksize_x, ksize_y));
 
-    /*
-    int start_y = box.rows/2.0 - half_size_y;
-    if(start_y<0) start_y = 0;
-    int start_x = box.cols/2.0 - half_size_x;
-    if(start_x<0) start_x = 0;
+    kernel.copyTo(pos);
 
-    for(int y=start_y; y < start_y +2*half_size_y && y < box.rows; y++) {
-        for(int x=start_x; x < start_x +2*half_size_x && x <box.cols; x++) {
-        box.at<int>(x,y) = 255;
-       }
+    if(invert) {
+        mask = Mat::ones(mask.size(), CV_32F) - mask;
     }
-    */
-    IplImage img = box;
-    // get the image data
-    int height    = (&img)->height;
-    int width     = (&img)->width;
-    int step      = (&img)->widthStep;
-    int channels  = (&img)->nChannels;
-    uchar *data      = (uchar *)(&img)->imageData;
-    int start_y = height/2 -  half_size_y;
-    if(start_y<0) start_y = 0;
-    int start_x = width/2.0 - half_size_x;
-    if(start_x<0) start_x = 0;
 
-     qDebug() << "createBoxMask channels:  " << channels << "  steps:  " << step;
-
-    for(int i=start_y;i <start_y +2*half_size_y && i<height;i++) {
-        for(int j=start_x;j<start_x +2*half_size_x && j<width;j++) {
-            for(int k=1;k<channels;k++) { //loop to read for each channel
-                //qDebug() << "set channel  " << i << "  " << j << " channels:  " << channels << "  " << step;
-                data[i*step+j*channels+k]=1;    //inverting the image
-            }
-        }
-    }
+    return mask;
 }
 
-Mat createGausFilterMask(Size mask_size, int x, int y, int ksize, bool normalization, bool invert) {
+Mat createGausFilterMask(Size mask_size, const int &x, const int &y, int ksize_x, int ksize_y, bool normalization, bool invert) {
 
     // Some corrections if out of bounds
-    /*
-    if(x < (ksize / 2)) {
-        ksize = x * 2;
+    if(x < (ksize_x / 2)) {
+        ksize_x = x * 2;
     }
-    if(y < (ksize / 2)) {
-        ksize = y * 2;
+    if(y < (ksize_y / 2)) {
+        ksize_y = y * 2;
     }
-    if(mask_size.width - x < ksize / 2 ) {
-        ksize = (mask_size.width - x ) * 2;
+    if(mask_size.width - x < ksize_x / 2 ) {
+        ksize_x = (mask_size.width - x ) * 2;
     }
-    if(mask_size.height - y < ksize / 2 ) {
-        ksize = (mask_size.height - y) * 2;
+    if(mask_size.height - y < ksize_y / 2 ) {
+        ksize_y = (mask_size.height - y) * 2;
     }
-*/
     // call openCV gaussian kernel generator
-    double sigma = -1;
-    Mat kernelX = getGaussianKernel(ksize, sigma, CV_32F);
-    Mat kernelY = getGaussianKernel(ksize, sigma, CV_32F);
+    double sigma = 1;
+    Mat kernelX = getGaussianKernel(ksize_x, sigma, CV_32F);
+    Mat kernelY = getGaussianKernel(ksize_y, sigma, CV_32F);
     // create 2d gaus
-    Mat kernel = kernelX * kernelY.t();
+    Mat kernel = kernelY * kernelX.t();
     // create empty mask
     Mat mask = Mat::zeros(mask_size, CV_32F);
     Mat maski = Mat::zeros(mask_size, CV_32F);
 
-    //std::cout << "before:n" << mask << std::endl;
     // copy kernel to mask on x,y
-    Mat pos(mask, Rect(x - ksize / 2, y - ksize / 2, ksize, ksize));
+    Mat pos(mask, Rect(x - ksize_x / 2, y - ksize_y / 2, ksize_x, ksize_y));
+
     kernel.copyTo(pos);
 
      //std::cout << "after:n" << mask << std::endl;
 
     // create mirrored mask
-    Mat posi(maski, Rect(( mask_size.width - x) - ksize / 2, (mask_size.height - y) - ksize / 2, ksize, ksize));
-    kernel.copyTo(posi);
+    //Mat posi(maski, Rect(( mask_size.width - x) - ksize / 2, (mask_size.height - y) - ksize / 2, ksize, ksize));
+    //kernel.copyTo(posi);
     // add mirrored to mask
-    add(mask, maski, mask);
+    //add(mask, maski, mask);
 
     // transform mask to range 0..1
     if(normalization) {
         normalize(mask, mask, 0, 1, NORM_MINMAX);
     }
-
-    // invert mask
+     // invert mask
     if(invert) {
         mask = Mat::ones(mask.size(), CV_32F) - mask;
     }

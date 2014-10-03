@@ -26,7 +26,7 @@ public:
 
     void SetTextBox(const int& ibox, const QString& text);
 
-    QPushButton *GetPushButton() { return btn1; }
+    const QPushButton* GetPushButton() { return btn1; }
 
 signals:
 

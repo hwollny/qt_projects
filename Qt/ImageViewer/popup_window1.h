@@ -25,7 +25,7 @@ public:
 
     void SetStepSizeBox2(const int& step) { box2->setSingleStep(step); }
 
-    QPushButton *GetPushButton() { return btn1; }
+    const QPushButton *GetPushButton() { return btn1; }
 
 signals:
 
